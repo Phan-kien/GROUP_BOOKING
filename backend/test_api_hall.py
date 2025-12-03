@@ -5,7 +5,7 @@ BASE = "http://127.0.0.1:5000/api"
 def test_create_hall():
     print("=== CREATE HALL ===")
     payload = {
-        "cinema_id": "1",        # ID cinema đã tồn tại trong DB
+        "cinema_id": "CIN251203001",        # ID cinema đã tồn tại trong DB
         "hall_name": "Hall A"
     }
     res = requests.post(BASE + "/hall", json=payload)

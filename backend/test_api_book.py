@@ -4,9 +4,9 @@ BASE = "http://127.0.0.1:5000/api"
 
 def test_create_book():
     payload = {
-        "cus_id": 3,
+        "cus_id": "CUS251203001",
         "ticket_id": 1,
-        "payment_id": 1
+        "payment_id": "PAY251203001"
     }
     res = requests.post(BASE + "/book", json=payload)
     print("=== CREATE BOOK ===")

@@ -6,32 +6,41 @@ class CinemaDAO(CinemaDAOInterface):
     def create(self, cinema):
         conn = get_connection()
         cursor = conn.cursor()
+        # Chỉ insert name + address, MySQL trigger sẽ tự sinh cinema_id
         cursor.execute(
-            "INSERT INTO tbl_cinema(cinema_id, cinema_name, address) VALUES (%s, %s, %s)",
-            (cinema.cinema_id, cinema.cinema_name, cinema.address)
+            "INSERT INTO tbl_cinema (cinema_name, address) VALUES (%s, %s)",
+            (cinema.cinema_name, cinema.address)
         )
         conn.commit()
+
+        # Lấy ID vừa insert
+        cursor.execute("SELECT cinema_id FROM tbl_cinema ORDER BY cinema_id DESC LIMIT 1")
+        cinema_id = cursor.fetchone()[0]
+        cinema.cinema_id = cinema_id
+
         cursor.close()
         conn.close()
         return cinema
 
     def get_all(self):
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM tbl_cinema")
+        cursor = conn.cursor()
+        cursor.execute("SELECT cinema_id, cinema_name, address FROM tbl_cinema")
         rows = cursor.fetchall()
-        cinemas = [Cinema(**row) for row in rows]
+        cinemas = [Cinema(cinema_id=r[0], cinema_name=r[1], address=r[2]) for r in rows]
         cursor.close()
         conn.close()
         return cinemas
 
     def get_by_id(self, cinema_id):
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM tbl_cinema WHERE cinema_id=%s", (cinema_id,))
+        cursor = conn.cursor()
+        cursor.execute("SELECT cinema_id, cinema_name, address FROM tbl_cinema WHERE cinema_id=%s", (cinema_id,))
         row = cursor.fetchone()
         cursor.close()
         conn.close()
+        if row:
+            return Cinema(cinema_id=row[0], cinema_name=row[1], address=row[2])
         return Cinema(**row) if row else None
 
     def update(self, cinema):
