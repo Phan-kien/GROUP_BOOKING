@@ -8,10 +8,17 @@ class CustomerDAO(CustomerDAOInterface):
         conn = get_connection()
         cursor = conn.cursor()
         try:
-            sql = "INSERT INTO tbl_customer (name, email, number_phone, password) VALUES (%s, %s, %s, %s)"
-            cursor.execute(sql, (customer.name, customer.email, customer.number_phone, customer.password))
+            sql = """
+                  INSERT INTO tbl_customer (cus_id, name, email, number_phone)
+                  VALUES (%s, %s, %s, %s) \
+                  """
+            cursor.execute(sql, (
+                customer.cus_id,
+                customer.name if customer.name else None,
+                customer.email if customer.email else None,
+                customer.number_phone if customer.number_phone else None
+            ))
             conn.commit()
-            customer.cus_id = cursor.lastrowid
             return customer
         finally:
             cursor.close()

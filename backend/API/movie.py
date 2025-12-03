@@ -34,5 +34,13 @@ def create_movie():
         "message": "Tạo movie thành công"
     }), 200
 
+@movie_api.route("/movies/search", methods=["GET"])
+def search_movies():
+        keyword = request.args.get("q", "")
+        movies = movie_business.search_movies(keyword)
+        data = [{"movie_id": m.movie_id, "title": m.title, "duration": m.duration, "genre": m.genre,
+                 "release_date": m.release_date, "rating": m.rating} for m in movies]
+        return jsonify(data), 200
+
 #if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=5000)
+#    app.run(debug=True, host="127.0.0.1", port=5000)

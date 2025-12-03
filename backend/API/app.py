@@ -1,6 +1,6 @@
 from flask import Flask
 
-from backend.API.auth import auth_api
+from backend.API.auth import customer_api
 from backend.API.book import book_api
 from backend.API.cinema import cinema_api
 from backend.API.combo import combo_api
@@ -14,7 +14,7 @@ from backend.API.ticket import ticket_api
 app = Flask(__name__)
 
 # register tất cả API
-app.register_blueprint(auth_api, url_prefix="/api")
+app.register_blueprint(customer_api, url_prefix="/api")
 app.register_blueprint(hall_api, url_prefix="/api")
 app.register_blueprint(book_api, url_prefix="/api")
 app.register_blueprint(cinema_api, url_prefix="/api")
