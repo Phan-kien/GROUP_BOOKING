@@ -1,34 +1,43 @@
 from flask import Blueprint,Flask, request, jsonify, session
 from backend.BUSINESS.CustomerBusiness import CustomerBusiness
+from backend.DAO.Customer.CustomerDAO_dao import CustomerDAO
+from backend.DAO.Customer.Customer_entity import Customer
+
 
 #app = Flask(__name__)
 customer_api = Blueprint("customer_api", __name__)
 customer_api.secret_key = "supersecretkey"
 customer_business = CustomerBusiness()
-
+dao = CustomerDAO()
 @customer_api.route('/')
 def home():
     return "Auth API is running!"
 @customer_api.route("/register", methods=["POST"])
 def register_customer():
+    """
+        Tạo customer mới.
+        Frontend tự sinh cus_id.
+        Các field name, email, number_phone có thể để trống.
+        """
     data = request.json
     if not data or "cus_id" not in data:
-        return jsonify({"error": "cus_id là bắt buộc"}), 400
+        return jsonify({"error": "Thiếu cus_id"}), 400
 
-    cus_id = data["cus_id"]
+    cus_id = data.get("cus_id")
     name = data.get("name")
     email = data.get("email")
     phone = data.get("number_phone")
 
     try:
-        customer = customer_business.register(cus_id, name, email, phone)
+        customer = Customer(cus_id=cus_id, name=name, email=email, number_phone=phone)
+        dao.create_customer(customer)
         return jsonify({
-            "cus_id": customer.cus_id,
-            "name": customer.name,
-            "email": customer.email,
-            "number_phone": customer.number_phone,
-            "message": "Tạo customer thành công"
-        }), 200
+            "cus_id": cus_id,
+            "name": name,
+            "email": email,
+            "number_phone": phone,
+            "message": "Customer lưu thành công"
+        }), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
