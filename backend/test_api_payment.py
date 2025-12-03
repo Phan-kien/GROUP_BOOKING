@@ -5,7 +5,7 @@ BASE = "http://127.0.0.1:5000/api"
 
 def test_create_payment():
     payload = {
-        "cus_id": 3,
+        "cus_id": "CUS251203001",
         "amount": 200000,
         "payment_paid": True,
         "status": "Thành công",

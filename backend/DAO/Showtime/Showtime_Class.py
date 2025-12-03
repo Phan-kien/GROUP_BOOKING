@@ -3,10 +3,11 @@ import uuid
 
 class ShowtimeHelper:
     @staticmethod
-    def generate_id():
-        return str(uuid.uuid4())
-
-    @staticmethod
-    def create_showtime_instance(hall_id, movie_id, date, start_time, end_time):
-        showtime_id = ShowtimeHelper.generate_id()
-        return Showtime(showtime_id, hall_id, movie_id, date, start_time, end_time)
+    def normalize_time(time_str):
+        parts = time_str.split(":")
+        if len(parts) == 2:
+            parts.append("00")
+        elif len(parts) != 3:
+            raise ValueError("Invalid time format. Must be HH:MM or HH:MM:SS")
+        h, m, s = map(int, parts)
+        return f"{h:02d}:{m:02d}:{s:02d}"
