@@ -6,9 +6,9 @@ def test_create_ticket():
     payload = {
         "price": 120000,
         "seat": "A1",
-        "cus_id": 3,
-        "showtime_id": 1,
-        "payment_id": 1
+        "cus_id": "CUS251203001",
+        "showtime_id": "SHO251203001",
+        "payment_id": "PAY251203002"
     }
     res = requests.post(BASE + "/ticket", json=payload)
     print("=== CREATE TICKET ===")
