@@ -70,5 +70,38 @@ def create_showtime():
         "message": "Tạo showtime thành công"
     }), 200
 
+@showtime_api.route("/showtimes", methods=["GET"])
+def get_showtime():
+    hall_id = request.args.get("hall_id")
+    movie_id = request.args.get("movie_id")
+
+    showtimes = showtime_business.get_showtimes(hall_id, movie_id)
+    data = [{
+        "showtime_id": s.showtime_id,
+        "date": s.date,
+        "start_time": s.start_time,
+        "end_time": s.end_time
+    } for s in showtimes]
+
+    return jsonify(data), 200
+
+@showtime_api.route("/showtime/by-hall/<int:hall_id>", methods=["GET"])
+@showtime_api.route("/showtime/by-hall/<int:hall_id>", methods=["GET"])
+def get_showtimes_by_hall(hall_id):
+    showtimes = showtime_business.get_showtimes_by_hall(hall_id)
+
+    result = []
+    for s in showtimes:
+        result.append({
+            "showtime_id": s.showtime_id,
+            "hall_id": s.hall_id,
+            "movie_id": s.movie_id,
+            "date": str(s.date),
+            "start_time": str(s.start_time),
+            "end_time": str(s.end_time)
+        })
+
+    return jsonify(result)
+
     #if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Movie → Cinema → Hall → Showtime</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        #home-btn {
+            padding: 10px 18px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        #search-box {
+            padding: 10px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .item {
+            padding: 8px;
+            margin: 6px 0;
+            background: #f2f2f2;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HOME BUTTON -->
+<button id="home-btn" onclick="goHome()">🏠 Home</button>
+
+<!-- SEARCH MOVIE -->
+<input id="search-box" type="text" placeholder="Search movie..." onkeyup="searchMovie()" />
+
+<h1>Danh sách phim</h1>
+<div id="movie-list"></div>
+
+<h2 id="cinema-title" style="display:none">Danh sách rạp</h2>
+<div id="cinema-list"></div>
+
+<h2 id="hall-title" style="display:none">Danh sách phòng chiếu</h2>
+<div id="hall-list"></div>
+
+<h2 id="showtime-title" style="display:none">Danh sách suất chiếu</h2>
+<div id="showtime-list"></div>
+
+<script>
+const API = "http://127.0.0.1:5000/api";
+
+/* ----------------------------
+   HOME BUTTON RESET UI
+---------------------------- */
+function goHome() {
+    document.getElementById("search-box").value = "";
+    loadMovies();
+
+    document.getElementById("cinema-title").style.display = "none";
+    document.getElementById("hall-title").style.display = "none";
+    document.getElementById("showtime-title").style.display = "none";
+
+    document.getElementById("cinema-list").innerHTML = "";
+    document.getElementById("hall-list").innerHTML = "";
+    document.getElementById("showtime-list").innerHTML = "";
+}
+
+/* ----------------------------
+   LOAD ALL MOVIES
+---------------------------- */
+async function loadMovies() {
+    const res = await fetch(`${API}/movies`);
+    const movies = await res.json();
+    renderMovies(movies);
+}
+
+function renderMovies(movies) {
+    let html = "";
+    movies.forEach(m => {
+        html += `
+            <div class="item" onclick="loadCinemas('${m.movie_id}')">
+                🎬 <b>${m.title}</b> — ${m.genre ?? ""}
+            </div>
+        `;
+    });
+    document.getElementById("movie-list").innerHTML = html;
+}
+
+/* ----------------------------
+   SEARCH MOVIE (REALTIME)
+---------------------------- */
+async function searchMovie() {
+    const keyword = document.getElementById("search-box").value.trim();
+
+    if (keyword === "") return loadMovies(); // reset
+
+    const res = await fetch(`${API}/movies/search?q=${keyword}`);
+    const movies = await res.json();
+    renderMovies(movies);
+}
+
+/* ----------------------------
+   LOAD CINEMAS BY MOVIE
+---------------------------- */
+let selectedMovie = null;
+
+async function loadCinemas(movie_id) {
+    selectedMovie = movie_id;
+
+    const res = await fetch(`${API}/cinemas?movie_id=${movie_id}`);
+    const cinemas = await res.json();
+
+    let html = "";
+    cinemas.forEach(c => {
+        html += `
+            <div class="item" onclick="loadHalls('${c.cinema_id}')">
+                🏢 <b>${c.cinema_name}</b> — ${c.address}
+            </div>
+        `;
+    });
+    document.getElementById("cinema-list").innerHTML = html;
+}
+
+/* ----------------------------
+   LOAD HALLS
+---------------------------- */
+async function loadHalls(cinema_id) {
+    const res = await fetch(`${API}/halls?cinema_id=${cinema_id}&movie_id=${selectedMovie}`);
+    const halls = await res.json();
+
+    let html = "";
+    halls.forEach(h => {
+        html += `
+            <div class="item" onclick="loadShowtimes('${h.hall_id}')">
+                🎟️ Hall: <b>${h.hall_name}</b>
+            </div>
+        `;
+    });
+    document.getElementById("hall-list").innerHTML = html;
+}
+
+
+/* ----------------------------
+   LOAD SHOWTIMES
+---------------------------- */
+async function loadShowtimes(hall_id) {
+    const res = await fetch(`${API}/showtimes?hall_id=${hall_id}&movie_id=${selectedMovie}`);
+    const showtimes = await res.json();
+
+    let html = "";
+    showtimes.forEach(s => {
+        html += `
+            <div class="item">
+                🕒 <b>${s.date}</b> — ${s.start_time} → ${s.end_time}
+            </div>
+        `;
+    });
+    document.getElementById("showtime-list").innerHTML = html;
+}
+
+window.onload = loadMovies;
+</script>
+
+</body>
+</html>

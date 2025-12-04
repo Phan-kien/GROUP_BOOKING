@@ -21,6 +21,14 @@ def create_cinema():
     cinema = cinema_business.create_cinema(name, address)
     return jsonify({"cinema_id": cinema.cinema_id, "cinema_name": cinema.cinema_name, "address": cinema.address, "message": "Tạo cinema thành công"}), 200
 
+@cinema_api.route("/cinemas", methods=["GET"])
+def get_cinemas_by_movie():
+    movie_id = request.args.get("movie_id")
+
+    cinemas = cinema_business.get_cinemas_by_movie(movie_id)
+    data = [{"cinema_id": c.cinema_id, "cinema_name": c.cinema_name, "address": c.address} for c in cinemas]
+
+    return jsonify(data), 200
 #if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)
 

@@ -25,3 +25,6 @@ class ShowtimeBusiness:
         end_time = ShowtimeHelper.normalize_time(end_time)
 
         return self.dao.create_showtime(hall_id, movie_id, date, start_time, end_time)
+
+    def get_showtimes_by_hall_and_movie(self, hall_id, movie_id):
+        return self.dao.get_showtimes_by_hall_and_movie(hall_id, movie_id)

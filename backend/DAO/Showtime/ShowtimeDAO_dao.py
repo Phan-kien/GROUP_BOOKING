@@ -68,3 +68,17 @@ class ShowtimeDAO(ShowtimeDAOInterface):
 
         # Trả về entity hoàn chỉnh
         return Showtime(showtime_id, hall_id, movie_id, date, start_time, end_time)
+
+    def get_showtimes_by_hall(self, hall_id):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+                       SELECT showtime_id, hall_id, movie_id, date, start_time, end_time
+                       FROM tbl_showtime
+                       WHERE hall_id = %s
+                       """, (hall_id,))
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return [Showtime(*r) for r in rows]

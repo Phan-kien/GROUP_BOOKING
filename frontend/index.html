@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer API Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f6f6f6;
+        }
+        h2 { color: #333; }
+        .box {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056c1;
+        }
+        pre {
+            background: #222;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Customer API Tester</h1>
+
+<!-- REGISTER CUSTOMER -->
+<div class="box">
+    <h2>Register Customer</h2>
+
+    <label>Customer ID (auto-generated):</label>
+    <input id="cus_id" readonly>
+
+    <label>Name:</label>
+    <input id="name" placeholder="Nguyen Van A">
+
+    <label>Email:</label>
+    <input id="email" placeholder="abc@example.com">
+
+    <label>Phone:</label>
+    <input id="phone" placeholder="0901234567">
+
+    <button onclick="createCustomer()">Create Customer</button>
+
+    <h3>Response:</h3>
+    <pre id="createResult"></pre>
+</div>
+
+
+<!-- GET CUSTOMER -->
+<div class="box">
+    <h2>Get Customer</h2>
+
+    <label>Customer ID:</label>
+    <input id="cusId" placeholder="CUS-xxxx">
+
+    <button onclick="getCustomer()">Get Customer</button>
+
+    <h3>Response:</h3>
+    <pre id="getResult"></pre>
+</div>
+
+
+<script>
+    const BASE = "http://127.0.0.1:5000/api";
+
+    // Random CUS ID giống Python
+    function generateCusId() {
+        return "CUS-" + crypto.randomUUID().replace(/-/g, "").substring(0, 16);
+    }
+
+    // Gán ID ngay khi mở trang
+    window.onload = () => {
+        document.getElementById("cus_id").value = generateCusId();
+    };
+
+    // CREATE
+    async function createCustomer() {
+        const payload = {
+            cus_id: document.getElementById("cus_id").value,
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            number_phone: document.getElementById("phone").value
+        };
+
+        const res = await fetch(`${BASE}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.text();
+        document.getElementById("createResult").textContent =
+            "Status: " + res.status + "\n\n" + data;
+
+        // Tự điền cus_id vào ô GET
+        document.getElementById("cusId").value = payload.cus_id;
+    }
+
+    // GET
+    async function getCustomer() {
+        const cusId = document.getElementById("cusId").value;
+        const res = await fetch(`${BASE}/customer/${cusId}`);
+        const data = await res.text();
+
+        document.getElementById("getResult").textContent =
+            "Status: " + res.status + "\n\n" + data;
+    }
+</script>
+
+</body>
+</html>

@@ -16,3 +16,9 @@ class HallBusiness:
 
     def get_hall_by_id(self, hall_id):
         return self.hall_dao.get_hall_by_id(hall_id)
+
+    def get_halls_by_cinema_and_movie(self, cinema_id, movie_id):
+        return self.hall_dao.get_halls_by_cinema_and_movie(cinema_id, movie_id)
+
+    def get_halls_by_cinema(self, cinema_id):
+        return self.hall_dao.get_halls_by_cinema(cinema_id)

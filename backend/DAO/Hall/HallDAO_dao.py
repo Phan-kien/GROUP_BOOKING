@@ -42,3 +42,36 @@ class HallDAO(HallDAOInterface):
         if row:
             return Hall(hall_id=row[0], cinema_id=row[1], hall_name=row[2])
         return None
+
+    def get_halls_by_cinema(self, cinema_id):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT hall_id, cinema_id, hall_name FROM tbl_hall WHERE cinema_id=%s",
+            (cinema_id,)
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return [Hall(hall_id=r[0], cinema_id=r[1], hall_name=r[2]) for r in rows]
+
+    def get_halls_by_cinema_and_movie(self, cinema_id, movie_id):
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+                SELECT h.hall_id, h.cinema_id, h.hall_name
+                FROM tbl_hall h
+                         JOIN tbl_showtime s ON s.hall_id = h.hall_id
+                WHERE h.cinema_id = %s \
+                  AND s.movie_id = %s
+                GROUP BY h.hall_id \
+                """
+
+        cursor.execute(query, (cinema_id, movie_id))
+        rows = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return [Hall(hall_id=r[0], cinema_id=r[1], hall_name=r[2]) for r in rows]

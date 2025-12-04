@@ -26,3 +26,6 @@ class CinemaBusiness:
 
     def delete_cinema(self, cinema_id):
         return self.dao.delete(cinema_id)
+
+    def get_cinemas_by_movie(self, movie_id):
+        return self.dao.get_cinemas_by_movie(movie_id)
